@@ -1,13 +1,11 @@
-/* eslint-disable import/no-unresolved */
-import React, { useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { useGetTopChartsQuery } from "../redux/services/shazamCore"
+import { playPause, setActiveSong } from "../redux/features/playerSlice"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { FreeMode } from "swiper"
-
+import { useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
 import PlayPause from "./PlayPause"
-import { playPause, setActiveSong } from "../redux/features/playerSlice"
-import { useGetTopChartsQuery } from "../redux/services/shazamCore"
 
 import "swiper/css"
 import "swiper/css/free-mode"
@@ -53,24 +51,23 @@ const TopChartCard = ({
 
 const TopPlay = () => {
   const dispatch = useDispatch()
-  const { activeSong, isPlaying } = useSelector(state => state.player)
-  const { data } = useGetTopChartsQuery()
+  const { isPlaying, activeSong } = useSelector(state => state.player)
   const divRef = useRef(null)
 
-  useEffect(() => {
-    divRef.current.scrollIntoView({ behavior: "smooth" })
-  })
-
+  const { data } = useGetTopChartsQuery()
   const topPlays = data?.slice(0, 5)
 
   const handlePauseClick = () => {
     dispatch(playPause(false))
   }
-
   const handlePlayClick = (song, i) => {
-    dispatch(setActiveSong({ song, data, i }))
+    dispatch(setActiveSong({ song, i, data }))
     dispatch(playPause(true))
   }
+
+  useEffect(() => {
+    divRef.current.scrollIntoView({ behavior: "smooth" })
+  })
 
   return (
     <div
@@ -84,7 +81,6 @@ const TopPlay = () => {
             <p className='text-gray-300 text-base cursor-pointer'>See more</p>
           </Link>
         </div>
-
         <div className='mt-4 flex flex-col gap-1'>
           {topPlays?.map((song, i) => (
             <TopChartCard
@@ -137,5 +133,4 @@ const TopPlay = () => {
     </div>
   )
 }
-
 export default TopPlay
